@@ -38,7 +38,7 @@ if not st.session_state.started:
     
     with col2:
         
-        st.image("C:\\Users\\user\\OneDrive\\Hình ảnh\\Analytics-in-HR.jpg", width='stretch') 
+        st.image("Analytics-in-HR.jpg", width='stretch')
         
         st.title("👋 Welcome to")
         st.title("IBM HR Attrition Explorer")
