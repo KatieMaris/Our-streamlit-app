@@ -4,7 +4,7 @@ import numpy as np
 import plotly.express as px
 import os
 st.set_page_config(page_title="IBM HR Attrition Explorer", layout="wide")
-DATA_PATH = r"C:\\Users\\user\\OneDrive\\Tài liệu\\PYTHON\\WA_Fn-UseC_-HR-Employee-Attrition(in).csv"
+DATA_PATH = "WA_Fn-UseC_-HR-Employee-Attrition(in).csv"
 
 @st.cache_data
 def load_csv(path):
