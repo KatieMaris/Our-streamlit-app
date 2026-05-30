@@ -6,6 +6,31 @@ import os
 
 st.set_page_config(page_title="IBM HR Attrition Explorer", layout="wide")
 DATA_PATH = "WA_Fn-UseC_-HR-Employee-Attrition(in).csv"
+st.markdown("""
+<style>
+    /* 1. Đổi màu nền thanh Sidebar bên trái thành xanh nhạt */
+    [data-testid="stSidebar"] {
+        background-color: #F0F8FF;
+    }
+    
+    /* 2. Đổi màu chữ của tất cả các tiêu đề thành xanh biển đậm */
+    h1, h2, h3, h4 {
+        color: #004B87 !important;
+    }
+    
+    /* 3. Đổi màu viền và chữ của các nút bấm thành xanh biển */
+    div.stButton > button:first-child {
+        border: 2px solid #0073E6;
+        color: #0073E6;
+    }
+    
+    /* Hiệu ứng khi rê chuột vào nút bấm */
+    div.stButton > button:first-child:hover {
+        background-color: #0073E6;
+        color: white;
+    }
+</style>
+""", unsafe_allow_html=True)
 
 @st.cache_data
 def load_csv(path):
@@ -95,13 +120,13 @@ else:
     if main_menu == "📝 Overview":
         st.sidebar.markdown("---")
         st.sidebar.subheader("📂 Overview Sub-topics")
-        if st.sidebar.button("📊 General Overview", use_container_width=True):
+        if st.sidebar.button("General Overview", use_container_width=True):
             st.session_state.overview_sel = "General"
-        if st.sidebar.button("💼 Job Role Overview", use_container_width=True):
+        if st.sidebar.button("Job Role", use_container_width=True):
             st.session_state.overview_sel = "JobRole"
-        if st.sidebar.button("✈️ Business Travel Overview", use_container_width=True):
+        if st.sidebar.button("Business Travel", use_container_width=True):
             st.session_state.overview_sel = "BusinessTravel"
-        if st.sidebar.button("⏱️ Overtime Overview", use_container_width=True):
+        if st.sidebar.button("Overtime", use_container_width=True):
             st.session_state.overview_sel = "Overtime"
 
     # --- KHUNG NỘI DUNG CHÍNH TƯƠNG ỨNG VỚI MENU ---
@@ -172,7 +197,7 @@ else:
         col_v1, col_v2 = st.columns(2)
         
         with col_v1:
-            st.subheader("📊 Categorical Factors vs Attrition")
+            st.subheader("Categorical Factors vs Attrition")
             available_cats = [c for c in cat_cols if c != "Attrition"]
             if available_cats:
                 default_cat_idx = available_cats.index("JobRole") if "JobRole" in available_cats else 0
@@ -188,7 +213,7 @@ else:
                 st.info("No categorical columns available.")
 
         with col_v2:
-            st.subheader("📈 Numerical Distributions vs Attrition")
+            st.subheader("Numerical Distributions vs Attrition")
             if num_cols:
                 default_num_idx = num_cols.index("MonthlyIncome") if "MonthlyIncome" in num_cols else 0
                 selected_num = st.selectbox("Choose a metric to check its distribution:", options=num_cols, index=default_num_idx)
