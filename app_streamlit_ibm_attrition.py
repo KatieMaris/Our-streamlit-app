@@ -72,68 +72,27 @@ else:
    
     st.sidebar.title("⚙️ Control Panel")
 
-    st.sidebar.header("1. Data Input")
-    uploaded_file = st.sidebar.file_uploader("Upload CSV file", type=["csv"])
-
-  
     df = None
-    if uploaded_file is not None:
-        try:
-            df = pd.read_csv(uploaded_file)
-        except Exception as e:
-            st.sidebar.error(f"Error reading uploaded file: {e}")
-            st.stop()
-    else:
-        if DATA_PATH and os.path.exists(DATA_PATH):
-            df = load_csv(DATA_PATH)
-            st.sidebar.success("Using default data path.")
-
-   
+    if DATA_PATH and os.path.exists(DATA_PATH):
+        df = load_csv(DATA_PATH)
+    
     if df is None:
-        st.info("👋 Please upload a CSV file on the sidebar or set the correct DATA_PATH in the source code.")
+        st.info("👋 Please set the correct DATA_PATH in the source code.")
         st.stop()
 
-   
     df.columns = df.columns.str.strip()
     num_cols = numeric_columns(df)
     cat_cols = categorical_columns(df)
 
-   
-    st.sidebar.header("2. Search & Filter")
-    text_query = st.sidebar.text_input("🔍 Global search (keyword)")
-
-    st.sidebar.markdown("---")
-    
-  
-    gender_sel = st.sidebar.multiselect("Gender", options=sorted(df["Gender"].dropna().unique())) if "Gender" in df.columns else []
-    edu_sel = st.sidebar.multiselect("Education Field", options=sorted(df["EducationField"].dropna().unique())) if "EducationField" in df.columns else []
-    bt_sel = st.sidebar.multiselect("Business Travel", options=sorted(df["BusinessTravel"].dropna().unique())) if "BusinessTravel" in df.columns else []
-
-    age_min, age_max = None, None
-    if "Age" in df.columns:
-        age_min_val, age_max_val = float(df["Age"].min()), float(df["Age"].max())
-        if age_min_val < age_max_val:
-            age_range = st.sidebar.slider("Age Range", min_value=age_min_val, max_value=age_max_val, value=(age_min_val, age_max_val), step=1.0)
-            age_min, age_max = age_range
-        else:
-            st.sidebar.caption(f"Constant Age: {age_min_val}")
-            age_min, age_max = age_min_val, age_max_val
-
-    
-    df_filtered = df.copy()
-
-    if gender_sel:
-        df_filtered = df_filtered[df_filtered["Gender"].isin(gender_sel)]
-    if edu_sel:
-        df_filtered = df_filtered[df_filtered["EducationField"].isin(edu_sel)]
-    if bt_sel:
-        df_filtered = df_filtered[df_filtered["BusinessTravel"].isin(bt_sel)]
-    if age_min is not None and age_max is not None:
-        df_filtered = df_filtered[(df_filtered["Age"] >= age_min) & (df_filtered["Age"] <= age_max)]
-
-    search_columns = cat_cols + num_cols
-    df_filtered = global_text_search(df_filtered, text_query, search_columns)
-
+    st.sidebar.header("📂 Overview Sub-topics")
+    if st.sidebar.button("📊 General Overview", use_container_width=True):
+        st.session_state.overview_sel = "General"
+    if st.sidebar.button("💼 Job Role Overview", use_container_width=True):
+        st.session_state.overview_sel = "JobRole"
+    if st.sidebar.button("✈️ Business Travel Overview", use_container_width=True):
+        st.session_state.overview_sel = "BusinessTravel"
+    if st.sidebar.button("⏱️ Overtime Overview", use_container_width=True):
+        st.session_state.overview_sel = "Overtime"
 
     st.title("📊 IBM HR Attrition Explorer")
     st.caption("Use the Control Panel on the left sidebar to interact with the data across all tabs.")
