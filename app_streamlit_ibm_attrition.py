@@ -115,13 +115,13 @@ else:
                 if "MonthlyIncome" in df.columns:
                     fig_hist = px.histogram(df, x="MonthlyIncome", nbins=40, title="Monthly Income Distribution", marginal="box")
                     st.plotly_chart(fig_hist, use_container_width=True)
-            elif st.session_state.overview_sel == "JobRole":
-            st.subheader("💼 Job Role Distribution Analysis")
-            if "JobRole" in df.columns:
-                job_counts = df["JobRole"].value_counts().reset_index()
-                job_counts.columns = ["JobRole", "Count"]
-                fig_job = px.bar(job_counts, x="Count", y="JobRole", orientation='h', title="Employee Counts by Job Role", color="Count", color_continuous_scale="Blugrn")
-                st.plotly_chart(fig_job, use_container_width=True)
+                elif st.session_state.overview_sel == "JobRole":
+                    st.subheader("💼 Job Role Distribution Analysis")
+                if "JobRole" in df.columns:
+                    job_counts = df["JobRole"].value_counts().reset_index()
+                    job_counts.columns = ["JobRole", "Count"]
+                    fig_job = px.bar(job_counts, x="Count", y="JobRole", orientation='h', title="Employee Counts by Job Role", color="Count", color_continuous_scale="Blugrn")
+                    st.plotly_chart(fig_job, use_container_width=True)
                 
                 if "Attrition" in df.columns:
                     grp_job = df.groupby(["JobRole", "Attrition"]).size().reset_index(name="count")
@@ -130,13 +130,13 @@ else:
             else:
                 st.info("Missing 'JobRole' column in the dataset.")
 
-        elif st.session_state.overview_sel == "BusinessTravel":
-            st.subheader("✈️ Business Travel Frequency Breakdown")
-            if "BusinessTravel" in df.columns:
-                bt_counts = df["BusinessTravel"].value_counts().reset_index()
-                bt_counts.columns = ["BusinessTravel", "Count"]
-                fig_bt = px.pie(bt_counts, names="BusinessTravel", values="Count", title="Business Travel Proportions", hole=0.4)
-                st.plotly_chart(fig_bt, use_container_width=True)
+                elif st.session_state.overview_sel == "BusinessTravel":
+                     st.subheader("✈️ Business Travel Frequency Breakdown")
+                if "BusinessTravel" in df.columns:
+                     bt_counts = df["BusinessTravel"].value_counts().reset_index()
+                     bt_counts.columns = ["BusinessTravel", "Count"]
+                     fig_bt = px.pie(bt_counts, names="BusinessTravel", values="Count", title="Business Travel Proportions", hole=0.4)
+                     st.plotly_chart(fig_bt, use_container_width=True)
                 
                 if "Attrition" in df.columns:
                     grp_bt = df.groupby(["BusinessTravel", "Attrition"]).size().reset_index(name="count")
@@ -145,13 +145,13 @@ else:
             else:
                 st.info("Missing 'BusinessTravel' column in the dataset.")
 
-        elif st.session_state.overview_sel == "Overtime":
-            st.subheader("⏱️ Overtime Work Breakdown")
-            if "OverTime" in df.columns:
-                ot_counts = df["OverTime"].value_counts().reset_index()
-                ot_counts.columns = ["OverTime", "Count"]
-                fig_ot = px.pie(ot_counts, names="OverTime", values="Count", title="Proportion of Employees Working Overtime", hole=0.4)
-                st.plotly_chart(fig_ot, use_container_width=True)
+                elif st.session_state.overview_sel == "Overtime":
+                     st.subheader("⏱️ Overtime Work Breakdown")
+                if "OverTime" in df.columns:
+                     ot_counts = df["OverTime"].value_counts().reset_index()
+                     ot_counts.columns = ["OverTime", "Count"]
+                     fig_ot = px.pie(ot_counts, names="OverTime", values="Count", title="Proportion of Employees Working Overtime", hole=0.4)
+                     st.plotly_chart(fig_ot, use_container_width=True)
                 
                 if "Attrition" in df.columns:
                     grp_ot = df.groupby(["OverTime", "Attrition"]).size().reset_index(name="count")
