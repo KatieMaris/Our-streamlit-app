@@ -127,8 +127,8 @@ else:
                     grp_job = df.groupby(["JobRole", "Attrition"]).size().reset_index(name="count")
                     fig_job_attr = px.bar(grp_job, x="count", y="JobRole", color="Attrition", barmode="group", orientation='h', title="Attrition breakdown across Job Roles")
                     st.plotly_chart(fig_job_attr, use_container_width=True)
-            else:
-                st.info("Missing 'JobRole' column in the dataset.")
+                else:
+                    st.info("Missing 'JobRole' column in the dataset.")
 
                 elif st.session_state.overview_sel == "BusinessTravel":
                      st.subheader("✈️ Business Travel Frequency Breakdown")
@@ -142,8 +142,8 @@ else:
                     grp_bt = df.groupby(["BusinessTravel", "Attrition"]).size().reset_index(name="count")
                     fig_bt_attr = px.bar(grp_bt, x="BusinessTravel", y="count", color="Attrition", barmode="group", title="Attrition Impact via Business Travel")
                     st.plotly_chart(fig_bt_attr, use_container_width=True)
-            else:
-                st.info("Missing 'BusinessTravel' column in the dataset.")
+                else:
+                    st.info("Missing 'BusinessTravel' column in the dataset.")
 
                 elif st.session_state.overview_sel == "Overtime":
                      st.subheader("⏱️ Overtime Work Breakdown")
@@ -157,9 +157,9 @@ else:
                     grp_ot = df.groupby(["OverTime", "Attrition"]).size().reset_index(name="count")
                     fig_ot_attr = px.bar(grp_ot, x="OverTime", y="count", color="Attrition", barmode="group", title="Attrition Comparison: Overtime vs No Overtime")
                     st.plotly_chart(fig_ot_attr, use_container_width=True)
-            else:
-                st.info("Missing 'OverTime' column in the dataset.")
-             
+                else:
+                    st.info("Missing 'OverTime' column in the dataset.")
+               
     with tab_visuals:
        st.header(f"Visualizations ({len(df)} records)")
         
