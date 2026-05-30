@@ -111,10 +111,10 @@ else:
                     st.plotly_chart(fig_pie, use_container_width=True)
                 
             with col2:
-            st.subheader("Original Income Distribution")
-            if "MonthlyIncome" in df.columns:
-                fig_hist = px.histogram(df, x="MonthlyIncome", nbins=40, title="Monthly Income Distribution", marginal="box")
-                st.plotly_chart(fig_hist, width='stretch')
+                st.subheader("Original Income Distribution")
+                if "MonthlyIncome" in df.columns:
+                    fig_hist = px.histogram(df, x="MonthlyIncome", nbins=40, title="Monthly Income Distribution", marginal="box")
+                    st.plotly_chart(fig_hist, use_container_width=True)
             elif st.session_state.overview_sel == "JobRole":
             st.subheader("💼 Job Role Distribution Analysis")
             if "JobRole" in df.columns:
