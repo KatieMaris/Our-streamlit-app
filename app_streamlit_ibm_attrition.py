@@ -85,13 +85,13 @@ else:
     cat_cols = categorical_columns(df)
 
     st.sidebar.header("📂 Overview Sub-topics")
-    if st.sidebar.button("📊 General Overview", use_container_width=True):
+    if st.sidebar.button("General Overview", use_container_width=True):
         st.session_state.overview_sel = "General"
-    if st.sidebar.button("💼 Job Role Overview", use_container_width=True):
+    if st.sidebar.button("Job Role", use_container_width=True):
         st.session_state.overview_sel = "JobRole"
-    if st.sidebar.button("✈️ Business Travel Overview", use_container_width=True):
+    if st.sidebar.button("Business Travel", use_container_width=True):
         st.session_state.overview_sel = "BusinessTravel"
-    if st.sidebar.button("⏱️ Overtime Overview", use_container_width=True):
+    if st.sidebar.button("Overtime", use_container_width=True):
         st.session_state.overview_sel = "Overtime"
 
     st.title("📊 IBM HR Attrition Explorer")
@@ -99,43 +99,85 @@ else:
 
     tab_overview, tab_visuals, tab_table = st.tabs(["📝 Overview", "📈 Visualizations", "📋 Data Table"])
 
-    
     with tab_overview:
-        col1, col2 = st.columns(2)
-        with col1:
-            st.subheader("Original Data Overview")
-            if "Attrition" in df.columns:
-                attr_counts = df["Attrition"].value_counts().reset_index()
-                attr_counts.columns = ["Attrition", "Count"]
-                fig_pie = px.pie(attr_counts, names="Attrition", values="Count", title="Overall Attrition Rate", hole=0.4)
-                st.plotly_chart(fig_pie, width='stretch')
+       if st.session_state.overview_sel == "General":
+            col1, col2 = st.columns(2)
+            with col1:
+                st.subheader("Original Data Overview")
+                if "Attrition" in df.columns:
+                    attr_counts = df["Attrition"].value_counts().reset_index()
+                    attr_counts.columns = ["Attrition", "Count"]
+                    fig_pie = px.pie(attr_counts, names="Attrition", values="Count", title="Overall Attrition Rate", hole=0.4)
+                    st.plotly_chart(fig_pie, use_container_width=True)
                 
         with col2:
             st.subheader("Original Income Distribution")
             if "MonthlyIncome" in df.columns:
                 fig_hist = px.histogram(df, x="MonthlyIncome", nbins=40, title="Monthly Income Distribution", marginal="box")
                 st.plotly_chart(fig_hist, width='stretch')
+            elif st.session_state.overview_sel == "JobRole":
+            st.subheader("💼 Job Role Distribution Analysis")
+            if "JobRole" in df.columns:
+                job_counts = df["JobRole"].value_counts().reset_index()
+                job_counts.columns = ["JobRole", "Count"]
+                fig_job = px.bar(job_counts, x="Count", y="JobRole", orientation='h', title="Employee Counts by Job Role", color="Count", color_continuous_scale="Blugrn")
+                st.plotly_chart(fig_job, use_container_width=True)
+                
+                if "Attrition" in df.columns:
+                    grp_job = df.groupby(["JobRole", "Attrition"]).size().reset_index(name="count")
+                    fig_job_attr = px.bar(grp_job, x="count", y="JobRole", color="Attrition", barmode="group", orientation='h', title="Attrition breakdown across Job Roles")
+                    st.plotly_chart(fig_job_attr, use_container_width=True)
+            else:
+                st.info("Missing 'JobRole' column in the dataset.")
 
-    
+        elif st.session_state.overview_sel == "BusinessTravel":
+            st.subheader("✈️ Business Travel Frequency Breakdown")
+            if "BusinessTravel" in df.columns:
+                bt_counts = df["BusinessTravel"].value_counts().reset_index()
+                bt_counts.columns = ["BusinessTravel", "Count"]
+                fig_bt = px.pie(bt_counts, names="BusinessTravel", values="Count", title="Business Travel Proportions", hole=0.4)
+                st.plotly_chart(fig_bt, use_container_width=True)
+                
+                if "Attrition" in df.columns:
+                    grp_bt = df.groupby(["BusinessTravel", "Attrition"]).size().reset_index(name="count")
+                    fig_bt_attr = px.bar(grp_bt, x="BusinessTravel", y="count", color="Attrition", barmode="group", title="Attrition Impact via Business Travel")
+                    st.plotly_chart(fig_bt_attr, use_container_width=True)
+            else:
+                st.info("Missing 'BusinessTravel' column in the dataset.")
+
+        elif st.session_state.overview_sel == "Overtime":
+            st.subheader("⏱️ Overtime Work Breakdown")
+            if "OverTime" in df.columns:
+                ot_counts = df["OverTime"].value_counts().reset_index()
+                ot_counts.columns = ["OverTime", "Count"]
+                fig_ot = px.pie(ot_counts, names="OverTime", values="Count", title="Proportion of Employees Working Overtime", hole=0.4)
+                st.plotly_chart(fig_ot, use_container_width=True)
+                
+                if "Attrition" in df.columns:
+                    grp_ot = df.groupby(["OverTime", "Attrition"]).size().reset_index(name="count")
+                    fig_ot_attr = px.bar(grp_ot, x="OverTime", y="count", color="Attrition", barmode="group", title="Attrition Comparison: Overtime vs No Overtime")
+                    st.plotly_chart(fig_ot_attr, use_container_width=True)
+            else:
+                st.info("Missing 'OverTime' column in the dataset.")
+             
     with tab_visuals:
-        st.header(f"Filtered Visualizations ({len(df_filtered)} records)")
+       st.header(f"Visualizations ({len(df)} records)")
         
         col_v1, col_v2 = st.columns(2)
-        
         with col_v1:
-            if "Gender" in df_filtered.columns and "Attrition" in df_filtered.columns:
-                grp = df_filtered.groupby(["Gender", "Attrition"]).size().reset_index(name="count")
+            if "Gender" in df.columns and "Attrition" in df.columns:
+                grp = df.groupby(["Gender", "Attrition"]).size().reset_index(name="count")
                 fig = px.bar(grp, x="Gender", y="count", color="Attrition", barmode="group", title="Attrition by Gender")
-                st.plotly_chart(fig, width='stretch')
+                st.plotly_chart(fig, use_container_width=True)
             else:
                 st.info("Missing 'Gender' or 'Attrition' column.")
 
         with col_v2:
-            if "EducationField" in df_filtered.columns and "Attrition" in df_filtered.columns:
-                grp = df_filtered.groupby(["EducationField", "Attrition"]).size().reset_index(name="count")
+            if "EducationField" in df.columns and "Attrition" in df.columns:
+                grp = df.groupby(["EducationField", "Attrition"]).size().reset_index(name="count")
                 fig2 = px.bar(grp, x="EducationField", y="count", color="Attrition", barmode="group", title="Attrition by Education Field")
                 fig2.update_layout(xaxis_tickangle=-45)
-                st.plotly_chart(fig2, width='stretch')
+                st.plotly_chart(fig2, use_container_width=True)
             else:
                 st.info("Missing 'EducationField' or 'Attrition' column.")
 
@@ -143,24 +185,59 @@ else:
         col_v3, col_v4 = st.columns(2)
 
         with col_v3:
-            if "MonthlyIncome" in df_filtered.columns:
-                fig3 = px.box(df_filtered, y="MonthlyIncome", x="Attrition" if "Attrition" in df_filtered.columns else None, 
-                              color="Attrition" if "Attrition" in df_filtered.columns else None, points="all", title="Income Distribution (Filtered)")
-                st.plotly_chart(fig3,width='stretch')
+            if "MonthlyIncome" in df.columns:
+                fig3 = px.box(df, y="MonthlyIncome", x="Attrition" if "Attrition" in df.columns else None, 
+                              color="Attrition" if "Attrition" in df.columns else None, points="all", title="Income Distribution")
+                st.plotly_chart(fig3, use_container_width=True)
             else:
                 st.info("Missing 'MonthlyIncome' column.")
 
         with col_v4:
-            filtered_num_cols = [c for c in num_cols if c in df_filtered.columns]
+            filtered_num_cols = [c for c in num_cols if c in df.columns]
             if len(filtered_num_cols) > 1:
-                corr = df_filtered[filtered_num_cols].corr()
+                corr = df[filtered_num_cols].corr()
                 fig_corr = px.imshow(corr, text_auto=False, aspect="auto", color_continuous_scale="RdBu_r", title="Correlation Matrix (Numeric)")
-                st.plotly_chart(fig_corr, width='stretch')
+                st.plotly_chart(fig_corr, use_container_width=True)
             else:
                 st.info("Not enough numeric columns available for correlation matrix.")
 
    
     with tab_table:
         st.header("Detailed Data Table")
+       with st.expander("🔍 Filter & Global Search Panel", expanded=True):
+            fil_col1, fil_col2, fil_col3 = st.columns(3)
+            
+            with fil_col1:
+                text_query = st.text_input("🔍 Global search (keyword)")
+                gender_sel = st.multiselect("Gender", options=sorted(df["Gender"].dropna().unique())) if "Gender" in df.columns else []
+                
+            with fil_col2:
+                edu_sel = st.multiselect("Education Field", options=sorted(df["EducationField"].dropna().unique())) if "EducationField" in df.columns else []
+                bt_sel = st.multiselect("Business Travel", options=sorted(df["BusinessTravel"].dropna().unique())) if "BusinessTravel" in df.columns else []
+                
+            with fil_col3:
+                if "Age" in df.columns:
+                    age_min_val, age_max_val = float(df["Age"].min()), float(df["Age"].max())
+                    if age_min_val < age_max_val:
+                        age_range = st.slider("Age Range", min_value=age_min_val, max_value=age_max_val, value=(age_min_val, age_max_val), step=1.0)
+                        age_min, age_max = age_range
+                    else:
+                        st.caption(f"Constant Age: {age_min_val}")
+                        age_min, age_max = age_min_val, age_max_val
+                else:
+                    age_min, age_max = None, None
+            df_filtered = df.copy()
+        if gender_sel:
+            df_filtered = df_filtered[df_filtered["Gender"].isin(gender_sel)]
+        if edu_sel:
+            df_filtered = df_filtered[df_filtered["EducationField"].isin(edu_sel)]
+        if bt_sel:
+            df_filtered = df_filtered[df_filtered["BusinessTravel"].isin(bt_sel)]
+        if age_min is not None and age_max is not None:
+            df_filtered = df_filtered[(df_filtered["Age"] >= age_min) & (df_filtered["Age"] <= age_max)]
+
+        search_columns = cat_cols + num_cols
+        df_filtered = global_text_search(df_filtered, text_query, search_columns)
         st.metric(label="Filtered Records Count", value=len(df_filtered))
-        st.dataframe(df_filtered.reset_index(drop=True), width='stretch')
+        st.dataframe(df_filtered.reset_index(drop=True), use_container_width=True)
+
