@@ -115,7 +115,7 @@ else:
                 if "MonthlyIncome" in df.columns:
                     fig_hist = px.histogram(df, x="MonthlyIncome", nbins=40, title="Monthly Income Distribution", marginal="box")
                     st.plotly_chart(fig_hist, use_container_width=True)
-              elif st.session_state.overview_sel == "JobRole":
+        elif st.session_state.overview_sel == "JobRole":
             st.subheader("💼 Job Role Distribution Analysis")
             if "JobRole" in df.columns:
                 job_counts = df["JobRole"].value_counts().reset_index()
@@ -145,20 +145,20 @@ else:
             else:
                 st.info("Missing 'BusinessTravel' column in the dataset.")
 
-                elif st.session_state.overview_sel == "Overtime":
-                     st.subheader("⏱️ Overtime Work Breakdown")
-                if "OverTime" in df.columns:
+         elif st.session_state.overview_sel == "Overtime":
+             st.subheader("⏱️ Overtime Work Breakdown")
+             if "OverTime" in df.columns:
                      ot_counts = df["OverTime"].value_counts().reset_index()
                      ot_counts.columns = ["OverTime", "Count"]
                      fig_ot = px.pie(ot_counts, names="OverTime", values="Count", title="Proportion of Employees Working Overtime", hole=0.4)
                      st.plotly_chart(fig_ot, use_container_width=True)
                 
-                if "Attrition" in df.columns:
+                    if "Attrition" in df.columns:
                     grp_ot = df.groupby(["OverTime", "Attrition"]).size().reset_index(name="count")
                     fig_ot_attr = px.bar(grp_ot, x="OverTime", y="count", color="Attrition", barmode="group", title="Attrition Comparison: Overtime vs No Overtime")
                     st.plotly_chart(fig_ot_attr, use_container_width=True)
-                else:
-                    st.info("Missing 'OverTime' column in the dataset.")
+             else:
+                 st.info("Missing 'OverTime' column in the dataset.")
                
     with tab_visuals:
        st.header(f"Visualizations ({len(df)} records)")
