@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 import os
+
 st.set_page_config(page_title="IBM HR Attrition Explorer", layout="wide")
 DATA_PATH = "WA_Fn-UseC_-HR-Employee-Attrition(in).csv"
 
@@ -33,12 +34,14 @@ def global_text_search(df, query, cols):
 if "started" not in st.session_state:
     st.session_state.started = False
 
+if "overview_sel" not in st.session_state:
+    st.session_state.overview_sel = "General"
+
 if not st.session_state.started:
     col1, col2, col3 = st.columns([1, 2, 1])
     
     with col2:
-        
-        st.image("Analytics-in-HR.jpg", width='stretch')
+        st.image("Analytics-in-HR.jpg", use_container_width=True)
         
         st.title("👋 Welcome to")
         st.title("IBM HR Attrition Explorer")
@@ -48,21 +51,18 @@ if not st.session_state.started:
         This dashboard is designed to help you analyze, visualize, and understand the core reasons behind employee turnover (Attrition) at IBM.
         
         **Key features:**
-        *   📊 **Overview:** Attrition rates and income distribution.
-        *   📈 **In-depth Analysis:** Correlations between age, gender, education field, and attrition.
-        *   📋 **Data Table:** Flexible filtering and search functionality for employee information.
+        * 📊 **Overview:** Attrition rates and income distribution.
+        * 📈 **In-depth Analysis:** Correlations between age, gender, education field, and attrition.
+        * 📋 **Data Table:** Flexible filtering and search functionality for employee information.
         """)
         
         st.markdown("<br>", unsafe_allow_html=True)
         
-        if st.button("🚀 Click here to start exploring", type="primary", width='stretch'):
+        if st.button("🚀 Click here to start exploring", type="primary", use_container_width=True):
             st.session_state.started = True
             st.rerun()
-        
-
 
 else:
-    
     if st.sidebar.button("🏠 Back to Introduction page"):
         st.session_state.started = False
         st.rerun()
@@ -83,21 +83,22 @@ else:
     cat_cols = categorical_columns(df)
 
     st.sidebar.header("📂 Overview Sub-topics")
-    if st.sidebar.button("General Overview", use_container_width=True):
+    if st.sidebar.button("📊 General Overview", use_container_width=True):
         st.session_state.overview_sel = "General"
-    if st.sidebar.button("Job Role", use_container_width=True):
+    if st.sidebar.button("💼 Job Role Overview", use_container_width=True):
         st.session_state.overview_sel = "JobRole"
-    if st.sidebar.button("Business Travel", use_container_width=True):
+    if st.sidebar.button("✈️ Business Travel Overview", use_container_width=True):
         st.session_state.overview_sel = "BusinessTravel"
-    if st.sidebar.button("Overtime", use_container_width=True):
+    if st.sidebar.button("⏱️ Overtime Overview", use_container_width=True):
         st.session_state.overview_sel = "Overtime"
 
+
     st.title("📊 IBM HR Attrition Explorer")
-    st.caption("Use the Control Panel on the left sidebar to interact with the data across all tabs.")
+    st.caption("Interact with the dashboard using the left sidebar choices and custom tab filters.")
 
     tab_overview, tab_visuals, tab_table = st.tabs(["📝 Overview", "📈 Visualizations", "📋 Data Table"])
 
-   with tab_overview:
+    with tab_overview:
         if st.session_state.overview_sel == "General":
             col1, col2 = st.columns(2)
             with col1:
@@ -241,4 +242,3 @@ else:
 
         st.metric(label="Filtered Records Count", value=len(df_filtered))
         st.dataframe(df_filtered.reset_index(drop=True), use_container_width=True)
-
