@@ -110,7 +110,7 @@ else:
                     fig_pie = px.pie(attr_counts, names="Attrition", values="Count", title="Overall Attrition Rate", hole=0.4)
                     st.plotly_chart(fig_pie, use_container_width=True)
                 
-        with col2:
+            with col2:
             st.subheader("Original Income Distribution")
             if "MonthlyIncome" in df.columns:
                 fig_hist = px.histogram(df, x="MonthlyIncome", nbins=40, title="Monthly Income Distribution", marginal="box")
