@@ -68,8 +68,6 @@ else:
         st.rerun()
         
     st.sidebar.markdown("---")
-    
-   
     st.sidebar.title("⚙️ Control Panel")
 
     df = None
@@ -99,8 +97,8 @@ else:
 
     tab_overview, tab_visuals, tab_table = st.tabs(["📝 Overview", "📈 Visualizations", "📋 Data Table"])
 
-    with tab_overview:
-       if st.session_state.overview_sel == "General":
+   with tab_overview:
+        if st.session_state.overview_sel == "General":
             col1, col2 = st.columns(2)
             with col1:
                 st.subheader("Original Data Overview")
@@ -109,12 +107,13 @@ else:
                     attr_counts.columns = ["Attrition", "Count"]
                     fig_pie = px.pie(attr_counts, names="Attrition", values="Count", title="Overall Attrition Rate", hole=0.4)
                     st.plotly_chart(fig_pie, use_container_width=True)
-                
+                    
             with col2:
                 st.subheader("Original Income Distribution")
                 if "MonthlyIncome" in df.columns:
                     fig_hist = px.histogram(df, x="MonthlyIncome", nbins=40, title="Monthly Income Distribution", marginal="box")
                     st.plotly_chart(fig_hist, use_container_width=True)
+
         elif st.session_state.overview_sel == "JobRole":
             st.subheader("💼 Job Role Distribution Analysis")
             if "JobRole" in df.columns:
@@ -145,23 +144,23 @@ else:
             else:
                 st.info("Missing 'BusinessTravel' column in the dataset.")
 
-         elif st.session_state.overview_sel == "Overtime":
-             st.subheader("⏱️ Overtime Work Breakdown")
-             if "OverTime" in df.columns:
-                     ot_counts = df["OverTime"].value_counts().reset_index()
-                     ot_counts.columns = ["OverTime", "Count"]
-                     fig_ot = px.pie(ot_counts, names="OverTime", values="Count", title="Proportion of Employees Working Overtime", hole=0.4)
-                     st.plotly_chart(fig_ot, use_container_width=True)
+        elif st.session_state.overview_sel == "Overtime":
+            st.subheader("⏱️ Overtime Work Breakdown")
+            if "OverTime" in df.columns:
+                ot_counts = df["OverTime"].value_counts().reset_index()
+                ot_counts.columns = ["OverTime", "Count"]
+                fig_ot = px.pie(ot_counts, names="OverTime", values="Count", title="Proportion of Employees Working Overtime", hole=0.4)
+                st.plotly_chart(fig_ot, use_container_width=True)
                 
-                    if "Attrition" in df.columns:
+                if "Attrition" in df.columns:
                     grp_ot = df.groupby(["OverTime", "Attrition"]).size().reset_index(name="count")
                     fig_ot_attr = px.bar(grp_ot, x="OverTime", y="count", color="Attrition", barmode="group", title="Attrition Comparison: Overtime vs No Overtime")
                     st.plotly_chart(fig_ot_attr, use_container_width=True)
-             else:
-                 st.info("Missing 'OverTime' column in the dataset.")
-               
+            else:
+                st.info("Missing 'OverTime' column in the dataset.")
+
     with tab_visuals:
-       st.header(f"Visualizations ({len(df)} records)")
+        st.header(f"Visualizations ({len(df)} records)")
         
         col_v1, col_v2 = st.columns(2)
         with col_v1:
@@ -201,10 +200,10 @@ else:
             else:
                 st.info("Not enough numeric columns available for correlation matrix.")
 
-   
     with tab_table:
         st.header("Detailed Data Table")
-       with st.expander("🔍 Filter & Global Search Panel", expanded=True):
+        
+        with st.expander("🔍 Filter & Global Search Panel", expanded=True):
             fil_col1, fil_col2, fil_col3 = st.columns(3)
             
             with fil_col1:
@@ -226,7 +225,8 @@ else:
                         age_min, age_max = age_min_val, age_max_val
                 else:
                     age_min, age_max = None, None
-            df_filtered = df.copy()
+
+        df_filtered = df.copy()
         if gender_sel:
             df_filtered = df_filtered[df_filtered["Gender"].isin(gender_sel)]
         if edu_sel:
@@ -238,6 +238,7 @@ else:
 
         search_columns = cat_cols + num_cols
         df_filtered = global_text_search(df_filtered, text_query, search_columns)
+
         st.metric(label="Filtered Records Count", value=len(df_filtered))
         st.dataframe(df_filtered.reset_index(drop=True), use_container_width=True)
 
