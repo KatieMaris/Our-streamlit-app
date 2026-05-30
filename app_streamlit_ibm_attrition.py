@@ -52,7 +52,7 @@ if not st.session_state.started:
         
         **Key features:**
         * 📊 **Overview:** Attrition rates and income distribution.
-        * 📈 **In-depth Analysis:** Correlations between age, gender, education field, and attrition.
+        * 📈 **In-depth Analysis:** Dynamic correlations between multiple features and attrition.
         * 📋 **Data Table:** Flexible filtering and search functionality for employee information.
         """)
         
@@ -63,13 +63,15 @@ if not st.session_state.started:
             st.rerun()
 
 else:
-    if st.sidebar.button("🏠 Back to Introduction page"):
+    # Nút quay về trang chủ
+    if st.sidebar.button("🏠 Back to Intro"):
         st.session_state.started = False
         st.rerun()
         
     st.sidebar.markdown("---")
     st.sidebar.title("⚙️ Control Panel")
 
+    # Đọc dữ liệu
     df = None
     if DATA_PATH and os.path.exists(DATA_PATH):
         df = load_csv(DATA_PATH)
@@ -82,23 +84,32 @@ else:
     num_cols = numeric_columns(df)
     cat_cols = categorical_columns(df)
 
-    st.sidebar.header("📂 Overview Sub-topics")
-    if st.sidebar.button("📊 General Overview", use_container_width=True):
-        st.session_state.overview_sel = "General"
-    if st.sidebar.button("💼 Job Role Overview", use_container_width=True):
-        st.session_state.overview_sel = "JobRole"
-    if st.sidebar.button("✈️ Business Travel Overview", use_container_width=True):
-        st.session_state.overview_sel = "BusinessTravel"
-    if st.sidebar.button("⏱️ Overtime Overview", use_container_width=True):
-        st.session_state.overview_sel = "Overtime"
+    # --- MENU ĐIỀU HƯỚNG CHÍNH ---
+    st.sidebar.subheader("📌 Navigation")
+    main_menu = st.sidebar.radio(
+        "Choose a section:",
+        ["📝 Overview", "📈 Visualizations", "📋 Data Table"]
+    )
 
+    # Nếu đang ở phần Overview, mới hiển thị các nút tiểu mục
+    if main_menu == "📝 Overview":
+        st.sidebar.markdown("---")
+        st.sidebar.subheader("📂 Overview Sub-topics")
+        if st.sidebar.button("📊 General Overview", use_container_width=True):
+            st.session_state.overview_sel = "General"
+        if st.sidebar.button("💼 Job Role Overview", use_container_width=True):
+            st.session_state.overview_sel = "JobRole"
+        if st.sidebar.button("✈️ Business Travel Overview", use_container_width=True):
+            st.session_state.overview_sel = "BusinessTravel"
+        if st.sidebar.button("⏱️ Overtime Overview", use_container_width=True):
+            st.session_state.overview_sel = "Overtime"
 
+    # --- KHUNG NỘI DUNG CHÍNH TƯƠNG ỨNG VỚI MENU ---
     st.title("📊 IBM HR Attrition Explorer")
-    st.caption("Interact with the dashboard using the left sidebar choices and custom tab filters.")
-
-    tab_overview, tab_visuals, tab_table = st.tabs(["📝 Overview", "📈 Visualizations", "📋 Data Table"])
-
-    with tab_overview:
+    
+    if main_menu == "📝 Overview":
+        st.caption("Select a sub-topic from the left sidebar to change this overview.")
+        
         if st.session_state.overview_sel == "General":
             col1, col2 = st.columns(2)
             with col1:
@@ -127,8 +138,6 @@ else:
                     grp_job = df.groupby(["JobRole", "Attrition"]).size().reset_index(name="count")
                     fig_job_attr = px.bar(grp_job, x="count", y="JobRole", color="Attrition", barmode="group", orientation='h', title="Attrition breakdown across Job Roles")
                     st.plotly_chart(fig_job_attr, use_container_width=True)
-            else:
-                st.info("Missing 'JobRole' column in the dataset.")
 
         elif st.session_state.overview_sel == "BusinessTravel":
             st.subheader("✈️ Business Travel Frequency Breakdown")
@@ -142,8 +151,6 @@ else:
                     grp_bt = df.groupby(["BusinessTravel", "Attrition"]).size().reset_index(name="count")
                     fig_bt_attr = px.bar(grp_bt, x="BusinessTravel", y="count", color="Attrition", barmode="group", title="Attrition Impact via Business Travel")
                     st.plotly_chart(fig_bt_attr, use_container_width=True)
-            else:
-                st.info("Missing 'BusinessTravel' column in the dataset.")
 
         elif st.session_state.overview_sel == "Overtime":
             st.subheader("⏱️ Overtime Work Breakdown")
@@ -157,52 +164,53 @@ else:
                     grp_ot = df.groupby(["OverTime", "Attrition"]).size().reset_index(name="count")
                     fig_ot_attr = px.bar(grp_ot, x="OverTime", y="count", color="Attrition", barmode="group", title="Attrition Comparison: Overtime vs No Overtime")
                     st.plotly_chart(fig_ot_attr, use_container_width=True)
-            else:
-                st.info("Missing 'OverTime' column in the dataset.")
 
-    with tab_visuals:
-        st.header(f"Visualizations ({len(df)} records)")
+
+    elif main_menu == "📈 Visualizations":
+        st.caption("Select different options below to explore how various employee factors relate to Attrition.")
         
         col_v1, col_v2 = st.columns(2)
+        
         with col_v1:
-            if "Gender" in df.columns and "Attrition" in df.columns:
-                grp = df.groupby(["Gender", "Attrition"]).size().reset_index(name="count")
-                fig = px.bar(grp, x="Gender", y="count", color="Attrition", barmode="group", title="Attrition by Gender")
-                st.plotly_chart(fig, use_container_width=True)
+            st.subheader("📊 Categorical Factors vs Attrition")
+            available_cats = [c for c in cat_cols if c != "Attrition"]
+            if available_cats:
+                default_cat_idx = available_cats.index("JobRole") if "JobRole" in available_cats else 0
+                selected_cat = st.selectbox("Choose an attribute to check attrition rates:", options=available_cats, index=default_cat_idx)
+                
+                if "Attrition" in df.columns:
+                    grp = df.groupby([selected_cat, "Attrition"]).size().reset_index(name="count")
+                    fig = px.bar(grp, x=selected_cat, y="count", color="Attrition", barmode="group", 
+                                 title=f"Attrition Breakdown by {selected_cat}", color_discrete_sequence=px.colors.qualitative.Set2)
+                    fig.update_layout(xaxis_tickangle=-45)
+                    st.plotly_chart(fig, use_container_width=True)
             else:
-                st.info("Missing 'Gender' or 'Attrition' column.")
+                st.info("No categorical columns available.")
 
         with col_v2:
-            if "EducationField" in df.columns and "Attrition" in df.columns:
-                grp = df.groupby(["EducationField", "Attrition"]).size().reset_index(name="count")
-                fig2 = px.bar(grp, x="EducationField", y="count", color="Attrition", barmode="group", title="Attrition by Education Field")
-                fig2.update_layout(xaxis_tickangle=-45)
-                st.plotly_chart(fig2, use_container_width=True)
+            st.subheader("📈 Numerical Distributions vs Attrition")
+            if num_cols:
+                default_num_idx = num_cols.index("MonthlyIncome") if "MonthlyIncome" in num_cols else 0
+                selected_num = st.selectbox("Choose a metric to check its distribution:", options=num_cols, index=default_num_idx)
+                
+                if "Attrition" in df.columns:
+                    fig_box = px.box(df, y=selected_num, x="Attrition", color="Attrition", points="all", 
+                                  title=f"{selected_num} Range by Attrition Status", color_discrete_sequence=px.colors.qualitative.Pastel)
+                    st.plotly_chart(fig_box, use_container_width=True)
             else:
-                st.info("Missing 'EducationField' or 'Attrition' column.")
+                st.info("No numeric columns available.")
 
         st.markdown("---")
-        col_v3, col_v4 = st.columns(2)
+        st.subheader("🔗 General Metric Correlations")
+        filtered_num_cols = [c for c in num_cols if c in df.columns]
+        if len(filtered_num_cols) > 1:
+            corr = df[filtered_num_cols].corr()
+            fig_corr = px.imshow(corr, text_auto=False, aspect="auto", color_continuous_scale="RdBu_r", title="Correlation Matrix (Numeric Features)")
+            st.plotly_chart(fig_corr, use_container_width=True)
 
-        with col_v3:
-            if "MonthlyIncome" in df.columns:
-                fig3 = px.box(df, y="MonthlyIncome", x="Attrition" if "Attrition" in df.columns else None, 
-                              color="Attrition" if "Attrition" in df.columns else None, points="all", title="Income Distribution")
-                st.plotly_chart(fig3, use_container_width=True)
-            else:
-                st.info("Missing 'MonthlyIncome' column.")
 
-        with col_v4:
-            filtered_num_cols = [c for c in num_cols if c in df.columns]
-            if len(filtered_num_cols) > 1:
-                corr = df[filtered_num_cols].corr()
-                fig_corr = px.imshow(corr, text_auto=False, aspect="auto", color_continuous_scale="RdBu_r", title="Correlation Matrix (Numeric)")
-                st.plotly_chart(fig_corr, use_container_width=True)
-            else:
-                st.info("Not enough numeric columns available for correlation matrix.")
-
-    with tab_table:
-        st.header("Detailed Data Table")
+    elif main_menu == "📋 Data Table":
+        st.caption("Use the expander below to filter and search the dataset.")
         
         with st.expander("🔍 Filter & Global Search Panel", expanded=True):
             fil_col1, fil_col2, fil_col3 = st.columns(3)
