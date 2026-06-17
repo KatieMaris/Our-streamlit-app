@@ -135,7 +135,7 @@ else:
     if main_menu == "📝 Overview":
         st.caption("Select a sub-topic from the left sidebar to change this overview.")
         
-        if st.session_state.overview_sel == "General":
+       if st.session_state.overview_sel == "General":
             col1, col2 = st.columns(2)
             with col1:
                 st.subheader("Original Data Overview")
@@ -151,45 +151,59 @@ else:
                     fig_hist = px.histogram(df, x="MonthlyIncome", nbins=40, title="Monthly Income Distribution", marginal="box")
                     st.plotly_chart(fig_hist, use_container_width=True)
 
+        # --- 2. JOB ROLE (ĐÃ CHỈNH THÀNH 2 CỘT) ---
         elif st.session_state.overview_sel == "JobRole":
             st.subheader("💼 Job Role Distribution Analysis")
-            if "JobRole" in df.columns:
-                job_counts = df["JobRole"].value_counts().reset_index()
-                job_counts.columns = ["JobRole", "Count"]
-                fig_job = px.bar(job_counts, x="Count", y="JobRole", orientation='h', title="Employee Counts by Job Role", color="Count", color_continuous_scale="Blugrn")
-                st.plotly_chart(fig_job, use_container_width=True)
+            col1, col2 = st.columns(2) # Tạo 2 cột
+            
+            with col1:
+                if "JobRole" in df.columns:
+                    job_counts = df["JobRole"].value_counts().reset_index()
+                    job_counts.columns = ["JobRole", "Count"]
+                    fig_job = px.bar(job_counts, x="Count", y="JobRole", orientation='h', title="Employee Counts by Job Role", color="Count", color_continuous_scale="Blugrn")
+                    st.plotly_chart(fig_job, use_container_width=True)
                 
-                if "Attrition" in df.columns:
+            with col2:
+                if "JobRole" in df.columns and "Attrition" in df.columns:
                     grp_job = df.groupby(["JobRole", "Attrition"]).size().reset_index(name="count")
                     fig_job_attr = px.bar(grp_job, x="count", y="JobRole", color="Attrition", barmode="group", orientation='h', title="Attrition breakdown across Job Roles")
                     st.plotly_chart(fig_job_attr, use_container_width=True)
 
+        # --- 3. BUSINESS TRAVEL (ĐÃ CHỈNH THÀNH 2 CỘT) ---
         elif st.session_state.overview_sel == "BusinessTravel":
             st.subheader("✈️ Business Travel Frequency Breakdown")
-            if "BusinessTravel" in df.columns:
-                bt_counts = df["BusinessTravel"].value_counts().reset_index()
-                bt_counts.columns = ["BusinessTravel", "Count"]
-                fig_bt = px.pie(bt_counts, names="BusinessTravel", values="Count", title="Business Travel Proportions", hole=0.4)
-                st.plotly_chart(fig_bt, use_container_width=True)
+            col1, col2 = st.columns(2) # Tạo 2 cột
+            
+            with col1:
+                if "BusinessTravel" in df.columns:
+                    bt_counts = df["BusinessTravel"].value_counts().reset_index()
+                    bt_counts.columns = ["BusinessTravel", "Count"]
+                    fig_bt = px.pie(bt_counts, names="BusinessTravel", values="Count", title="Business Travel Proportions", hole=0.4)
+                    st.plotly_chart(fig_bt, use_container_width=True)
                 
-                if "Attrition" in df.columns:
+            with col2:
+                if "BusinessTravel" in df.columns and "Attrition" in df.columns:
                     grp_bt = df.groupby(["BusinessTravel", "Attrition"]).size().reset_index(name="count")
                     fig_bt_attr = px.bar(grp_bt, x="BusinessTravel", y="count", color="Attrition", barmode="group", title="Attrition Impact via Business Travel")
                     st.plotly_chart(fig_bt_attr, use_container_width=True)
 
+        # --- 4. OVERTIME (ĐÃ CHỈNH THÀNH 2 CỘT) ---
         elif st.session_state.overview_sel == "Overtime":
             st.subheader("⏱️ Overtime Work Breakdown")
-            if "OverTime" in df.columns:
-                ot_counts = df["OverTime"].value_counts().reset_index()
-                ot_counts.columns = ["OverTime", "Count"]
-                fig_ot = px.pie(ot_counts, names="OverTime", values="Count", title="Proportion of Employees Working Overtime", hole=0.4)
-                st.plotly_chart(fig_ot, use_container_width=True)
+            col1, col2 = st.columns(2) # Tạo 2 cột
+            
+            with col1:
+                if "OverTime" in df.columns:
+                    ot_counts = df["OverTime"].value_counts().reset_index()
+                    ot_counts.columns = ["OverTime", "Count"]
+                    fig_ot = px.pie(ot_counts, names="OverTime", values="Count", title="Proportion of Employees Working Overtime", hole=0.4)
+                    st.plotly_chart(fig_ot, use_container_width=True)
                 
-                if "Attrition" in df.columns:
+            with col2:
+                if "OverTime" in df.columns and "Attrition" in df.columns:
                     grp_ot = df.groupby(["OverTime", "Attrition"]).size().reset_index(name="count")
                     fig_ot_attr = px.bar(grp_ot, x="OverTime", y="count", color="Attrition", barmode="group", title="Attrition Comparison: Overtime vs No Overtime")
                     st.plotly_chart(fig_ot_attr, use_container_width=True)
-
 
     elif main_menu == "📈 Visualizations":
         st.caption("Select different options below to explore how various employee factors relate to Attrition.")
