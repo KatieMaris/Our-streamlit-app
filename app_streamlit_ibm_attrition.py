@@ -135,7 +135,8 @@ else:
     if main_menu == "📝 Overview":
         st.caption("Select a sub-topic from the left sidebar to change this overview.")
         
-       if st.session_state.overview_sel == "General":
+        # --- 1. GENERAL OVERVIEW ---
+        if st.session_state.overview_sel == "General":
             col1, col2 = st.columns(2)
             with col1:
                 st.subheader("Original Data Overview")
@@ -151,10 +152,10 @@ else:
                     fig_hist = px.histogram(df, x="MonthlyIncome", nbins=40, title="Monthly Income Distribution", marginal="box")
                     st.plotly_chart(fig_hist, use_container_width=True)
 
-        # --- 2. JOB ROLE (ĐÃ CHỈNH THÀNH 2 CỘT) ---
+        # --- 2. JOB ROLE ---
         elif st.session_state.overview_sel == "JobRole":
             st.subheader("💼 Job Role Distribution Analysis")
-            col1, col2 = st.columns(2) # Tạo 2 cột
+            col1, col2 = st.columns(2)
             
             with col1:
                 if "JobRole" in df.columns:
@@ -169,10 +170,10 @@ else:
                     fig_job_attr = px.bar(grp_job, x="count", y="JobRole", color="Attrition", barmode="group", orientation='h', title="Attrition breakdown across Job Roles")
                     st.plotly_chart(fig_job_attr, use_container_width=True)
 
-        # --- 3. BUSINESS TRAVEL (ĐÃ CHỈNH THÀNH 2 CỘT) ---
+        # --- 3. BUSINESS TRAVEL ---
         elif st.session_state.overview_sel == "BusinessTravel":
             st.subheader("✈️ Business Travel Frequency Breakdown")
-            col1, col2 = st.columns(2) # Tạo 2 cột
+            col1, col2 = st.columns(2)
             
             with col1:
                 if "BusinessTravel" in df.columns:
@@ -187,10 +188,10 @@ else:
                     fig_bt_attr = px.bar(grp_bt, x="BusinessTravel", y="count", color="Attrition", barmode="group", title="Attrition Impact via Business Travel")
                     st.plotly_chart(fig_bt_attr, use_container_width=True)
 
-        # --- 4. OVERTIME (ĐÃ CHỈNH THÀNH 2 CỘT) ---
+        # --- 4. OVERTIME ---
         elif st.session_state.overview_sel == "Overtime":
             st.subheader("⏱️ Overtime Work Breakdown")
-            col1, col2 = st.columns(2) # Tạo 2 cột
+            col1, col2 = st.columns(2)
             
             with col1:
                 if "OverTime" in df.columns:
